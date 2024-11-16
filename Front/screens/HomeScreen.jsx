@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [importedFile, setImportedFile] = useState(null);
+
+  // const nav = useNavigation();
 
   // Fonction pour gérer l'importation de fichiers
   const handleImportFile = async () => {
@@ -23,6 +25,11 @@ const HomeScreen = () => {
       Alert.alert("Erreur", "Une erreur s'est produite lors de l'importation.");
       console.error(error);
     }
+  };
+
+  const handleMedicationPress = (med) => {
+    console.log(med);
+    navigation.navigate("MedicationDetailScreen", { medication: med });
   };
 
   const todaysMeds = [
@@ -52,7 +59,12 @@ const HomeScreen = () => {
           <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
         </View>
         {todaysMeds.map((med, index) => (
-          <View key={index} style={styles.medicationItem}>
+          <TouchableOpacity
+            key={index}
+            style={styles.medicationItem}
+            onPress={() => handleMedicationPress(med)} // Correctly binds the handler
+            activeOpacity={0.7} // Makes the touch interaction more visible
+          >
             <View style={styles.medicationInfo}>
               <View
                 style={[
@@ -66,7 +78,7 @@ const HomeScreen = () => {
               <FontAwesome5 name="clock" size={16} color="#666" />
               <Text style={styles.timeText}>{med.time}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
 
@@ -186,6 +198,7 @@ const styles = StyleSheet.create({
     color: "#1E88E5",
   },
   medicationItem: {
+    zIndex: 1000,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

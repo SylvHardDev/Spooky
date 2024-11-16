@@ -1,6 +1,7 @@
 // screens/MedicationDetailScreen.jsx
 import React, { useState } from 'react';
 import {
+  Button,
   View,
   Text,
   ScrollView,
@@ -13,8 +14,12 @@ import {
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { sendMessageToChatGPT } from '../services/chatgptService';
 
 const MedicationDetailScreen = ({ navigation }) => {
+
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState("")
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
 
@@ -39,18 +44,41 @@ const MedicationDetailScreen = ({ navigation }) => {
   };
 
   // Fonction pour envoyer un message au chat
-  const sendMessage = () => {
-    if (message.trim()) {
-      setChatHistory([...chatHistory, { text: message, user: true }]);
-      setMessage('');
-      // Simuler une réponse de l'IA
-      setTimeout(() => {
-        setChatHistory(prev => [...prev, {
-          text: "Je peux vous aider avec vos questions sur le Paracétamol.",
-          user: false
-        }]);
-      }, 1000);
+  // const sendMessage = () => {
+  //   if (message.trim()) {
+  //     setChatHistory([...chatHistory, { text: message, user: true }]);
+  //     setMessage('');
+  //     // Simuler une réponse de l'IA
+  //     setTimeout(() => {
+  //       setChatHistory(prev => [...prev, {
+  //         text: "Je peux vous aider avec vos questions sur le Paracétamol.",
+  //         user: false
+  //       }]);
+  //     }, 1000);
+  //   }
+  // };
+
+  const handleSendMessage = async () => {
+    if (!input.trim()) return;
+
+    const userMessage = { role: "user", content: input };
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const botReply = await sendMessageToChatGPT([...messages, userMessage]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: botReply },
+      ]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Error: Could not get a response." },
+      ]);
     }
+
+    setInput("");
   };
 
   return (
@@ -138,7 +166,7 @@ const MedicationDetailScreen = ({ navigation }) => {
             </View>
 
             {/* Input de chat */}
-            <View style={styles.chatInputContainer}>
+            {/* <View style={styles.chatInputContainer}>
               <TextInput
                 style={styles.chatInput}
                 value={message}
@@ -152,6 +180,26 @@ const MedicationDetailScreen = ({ navigation }) => {
               >
                 <Ionicons name="send" size={24} color="#6200ee" />
               </TouchableOpacity>
+            </View> */}
+
+            <View style={styles.container}>
+              <ScrollView style={styles.chatContainer}>
+                {messages.map((msg, index) => (
+                  <Text
+                    key={index}
+                    style={msg.role === "user" ? styles.userMessage : styles.botMessage}
+                  >
+                    {msg.content}
+                  </Text>
+                ))}
+              </ScrollView>
+              <TextInput
+                style={styles.input}
+                value={input}
+                onChangeText={setInput}
+                placeholder="Type your message..."
+              />
+              <Button title="Send" onPress={handleSendMessage} />
             </View>
           </View>
         </ScrollView>
@@ -161,6 +209,24 @@ const MedicationDetailScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  chatContainer: { flex: 1, marginBottom: 10 },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#d1e7dd",
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+  },
+  botMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#f8d7da",
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+  },
+  input: { borderWidth: 1, padding: 10, borderRadius: 5, marginBottom: 10 },
+
+
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',

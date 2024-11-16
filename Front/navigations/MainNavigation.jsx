@@ -6,9 +6,12 @@ import LoginScreen from "../screens/LoginScreen";
 import MedicationDetailScreen from "../screens/MedicationDetailScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 
+import { AuthProvider } from "../utils/authContext";
+
 const MainNavigation = () => {
   const Stack = createStackNavigator();
   return (
+    <AuthProvider>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -33,6 +36,7 @@ const MainNavigation = () => {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 };
 

@@ -1,10 +1,18 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState, useContext } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View, Image, Button } from "react-native";
+import { AuthContext } from "../utils/authContext.js";
 
 const HomeScreen = ({ navigation }) => {
   const [importedFile, setImportedFile] = useState(null);
+  const { user, logout } = useContext(AuthContext);
+  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+  // Génère l'URL complète de l'image de profil
+  const profileImageUrl = user?.profile_image
+    ? `${apiBaseUrl}/${user.profile_image.replace(/\\/g, "/")}`
+    : null;
 
   // const nav = useNavigation();
 
@@ -40,6 +48,23 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+      <Text style={styles.title}>Bienvenue, {user?.username || "Utilisateur"}</Text>
+
+{profileImageUrl ? (
+  <Image
+    source={{ uri: profileImageUrl }}
+    style={styles.profileImage}
+  />
+) : (
+  <Text style={styles.noImage}>Aucune image de profil disponible</Text>
+)}
+
+<Text style={styles.info}>Email: {user?.email || "Non disponible"}</Text>
+
+<Button title="Déconnexion" onPress={() => {
+  logout();
+  navigation.navigate("Login");
+}} />
         <Text style={styles.title}>MedicAlert</Text>
         <FontAwesome5 name="bell" size={24} color="#1E88E5" />
       </View>
@@ -266,6 +291,26 @@ const styles = StyleSheet.create({
   importedFileText: {
     fontSize: 14,
     color: "#1E88E5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 20,
+  },
+  noImage: {
+    fontSize: 16,
+    color: "gray",
+    marginBottom: 20,
+  },
+  info: {
+    fontSize: 18,
+    marginVertical: 8,
   },
 });
 

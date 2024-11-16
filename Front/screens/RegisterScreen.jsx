@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-const RegisterScreen = () => {
+const RegisterScreen = ({navigation}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -68,6 +68,7 @@ const RegisterScreen = () => {
         try {
           const data = await response.json();
           Alert.alert("Succès", "Inscription réussie");
+          navigation.navigate('Login')
        
         } catch (error) {
           console.error("Erreur parsing JSON:", error);

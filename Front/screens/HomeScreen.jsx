@@ -1,8 +1,30 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 
 const HomeScreen = () => {
+  const [importedFile, setImportedFile] = useState(null);
+
+  // Fonction pour gérer l'importation de fichiers
+  const handleImportFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "image/*"], // PDF et images
+      });
+
+      if (result.type === "success") {
+        setImportedFile(result);
+        Alert.alert("Fichier importé avec succès", `Nom : ${result.name}`);
+      } else {
+        Alert.alert("Importation annulée");
+      }
+    } catch (error) {
+      Alert.alert("Erreur", "Une erreur s'est produite lors de l'importation.");
+      console.error(error);
+    }
+  };
+
   const todaysMeds = [
     { name: "Doliprane 1000mg", time: "08:00", taken: false },
     { name: "Amoxicilline", time: "12:30", taken: true },
@@ -15,13 +37,15 @@ const HomeScreen = () => {
         <FontAwesome5 name="bell" size={24} color="#1E88E5" />
       </View>
 
-      {/* Texte sous MediScan */}
+      {/* Texte descriptif */}
       <Text style={styles.description}>
-      Scannez vos ordonnances : Importez rapidement vos ordonnances en PDF ou en photo.
-      Rappels personnalisés : Recevez des notifications discrètes au moment de prendre vos médicaments.
-      Agenda complet : Visualisez votre planning de traitement en un coup d'œil.
+        Scannez vos ordonnances : Importez rapidement vos ordonnances en PDF ou
+        en photo. Rappels personnalisés : Recevez des notifications discrètes au
+        moment de prendre vos médicaments. Agenda complet : Visualisez votre
+        planning de traitement en un coup d'œil.
       </Text>
 
+      {/* Planning du jour */}
       <View style={styles.scheduleCard}>
         <View style={styles.scheduleHeader}>
           <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
@@ -46,28 +70,47 @@ const HomeScreen = () => {
         ))}
       </View>
 
+      {/* Statistiques */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>85%</Text>
-          <Text style={styles.statLabel}>Respect du{'\n'}traitement</Text>
+          <Text style={styles.statLabel}>Respect du{"\n"}traitement</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>3/4</Text>
-          <Text style={styles.statLabel}>Prises{'\n'}aujourd'hui</Text>
+          <Text style={styles.statLabel}>Prises{"\n"}aujourd'hui</Text>
         </View>
       </View>
 
-   
+      {/* Boutons d'action */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#1E88E5" }]}>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: "#1E88E5" }]}
+          onPress={handleImportFile}
+        >
           <FontAwesome5 name="camera" size={24} color="white" />
-          <Text style={styles.actionButtonText}>Importer{'\n'}une ordonnance</Text>
+          <Text style={styles.actionButtonText}>
+            Importer{"\n"}une ordonnance
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#43A047" }]}>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: "#43A047" }]}
+        >
           <FontAwesome5 name="plus-circle" size={24} color="white" />
-          <Text style={styles.actionButtonText}>Scanner{'\n'}une ordonnance</Text>
+          <Text style={styles.actionButtonText}>
+            Scanner{"\n"}une ordonnance
+          </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Fichier importé */}
+      {importedFile && (
+        <View style={styles.importedFileContainer}>
+          <Text style={styles.importedFileText}>
+            Fichier importé : {importedFile.name}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -200,6 +243,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     textAlign: "center",
+  },
+  importedFileContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#E3F2FD",
+    borderRadius: 10,
+  },
+  importedFileText: {
+    fontSize: 14,
+    color: "#1E88E5",
   },
 });
 

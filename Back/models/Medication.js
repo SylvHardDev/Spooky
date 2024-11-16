@@ -32,18 +32,7 @@ const medicationSchema = new mongoose.Schema({
   instructions: {
     type: String,
     trim: true,
-  },
-  startDate: {
-    type: Date,
-    required: true,
-  },
-  endDate: {
-    type: Date,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  }
 });
 
 module.exports = mongoose.model('Medication', medicationSchema);

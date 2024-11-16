@@ -3,15 +3,13 @@ const Medication = require('../models/Medication');
 // Ajouter un médicament
 exports.addMedication = async (req, res) => {
   try {
-    const { name, dosage, schedule, instructions, startDate, endDate } = req.body;
+    const { name, dosage, schedule, instructions} = req.body;
 
     const newMedication = new Medication({
       name,
       dosage,
       schedule,
-      instructions,
-      startDate,
-      endDate,
+      instructions
     });
 
     await newMedication.save();

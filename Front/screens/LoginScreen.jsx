@@ -5,19 +5,39 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
-
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     try {
-     
-    } catch (err) {
-       
+      const response = await fetch("http://10.166.4.102:5001/api/auth/login", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password.trim(),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Si la connexion est réussie, naviguez vers l'écran souhaité
+        navigation.navigate("HomeScreen");
+        Alert.alert("Succès", "Connexion réussie!");
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Erreur", errorData.message || "Erreur lors de la connexion");
+      }
+    } catch (error) {
+      console.error("Erreur réseau:", error);
+      Alert.alert("Erreur", "Impossible de se connecter au serveur. Vérifiez votre connexion internet.");
     }
   };
 
@@ -25,16 +45,12 @@ const LoginScreen = ({ navigation }) => {
     <View style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
       <View style={styles.container}>
         <View style={styles.header}>
-         
-          <Text style={styles.title}>
-            Se connecter
-          </Text>
+          <Text style={styles.title}>Se connecter</Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.input}>
-            <Text style={styles.inputLabel}>Nom d ' utilisateur </Text>
-
+            <Text style={styles.inputLabel}>Nom d'utilisateur</Text>
             <TextInput
               autoCapitalize="none"
               autoCorrect={false}
@@ -48,7 +64,6 @@ const LoginScreen = ({ navigation }) => {
 
           <View style={styles.input}>
             <Text style={styles.inputLabel}>Mot de passe</Text>
-
             <TextInput
               autoCorrect={false}
               value={password}
@@ -76,8 +91,8 @@ const LoginScreen = ({ navigation }) => {
           style={{ marginTop: "auto" }}
         >
           <Text style={styles.formFooter}>
-            Vous n' avez pas encore de compte?{" "}
-            <Text style={{ textDecorationLine: "underline" }}>S' inscrire</Text>
+            Vous n'avez pas encore de compte?{" "}
+            <Text style={{ textDecorationLine: "underline" }}>S'inscrire</Text>
           </Text>
         </TouchableOpacity>
       </View>

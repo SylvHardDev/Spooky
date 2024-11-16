@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert , Image} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
-import { useUser } from '../utils/UserContext';
+import { useUser } from "../utils/UserContext";
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const { userData } = useUser();
-  const user = userData.user
+  const user = userData.user;
   console.log(user);
   const apiUrl = process.env.EXPO_PUBLIC_API_FILE;
   const [importedFile, setImportedFile] = useState(null);
@@ -42,28 +49,32 @@ const HomeScreen = ({navigation}) => {
         <Text>Bienvenue, {user?.username}</Text>
 
         <TouchableOpacity
-              onPress={() => navigation.navigate("MedicationDetailScreen")}
-            >
-               {user && user.profile_image && (() => {
-    // Correction du chemin de l'image
-    const imageUri = `${apiUrl}/${user.profile_image.replace(/\\/g, "/")}`;
-    console.log("Chemin de l'image:", imageUri); // Log du chemin de l'image
+          onPress={() => navigation.navigate("MedicationDetailScreen")}
+        >
+          {user &&
+            user.profile_image &&
+            (() => {
+              // Correction du chemin de l'image
+              const imageUri = `${apiUrl}/${user.profile_image.replace(
+                /\\/g,
+                "/"
+              )}`;
+              console.log("Chemin de l'image:", imageUri); // Log du chemin de l'image
 
-    return (
-      <Image
-        style={{
-          height: 50,
-          width: 50,
-          borderRadius: 20,
-        }}
-        source={{
-          uri: imageUri, // Utilisation de l'URI corrigée
-        }}
-      />
-    );
-})()}
-   
-            </TouchableOpacity>
+              return (
+                <Image
+                  style={{
+                    height: 50,
+                    width: 50,
+                    borderRadius: 20,
+                  }}
+                  source={{
+                    uri: imageUri, // Utilisation de l'URI corrigée
+                  }}
+                />
+              );
+            })()}
+        </TouchableOpacity>
         <FontAwesome5 name="bell" size={24} color="#1E88E5" />
       </View>
 

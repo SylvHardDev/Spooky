@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const dbConnection = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const medicationRoutes = require("./routes/medicationRoutes")
 const path = require("path");
 
 app.use(bodyParser.json());
@@ -23,6 +24,7 @@ app.use(
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/medication", medicationRoutes);
 
 dbConnection.on(
   "error",

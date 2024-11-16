@@ -68,7 +68,7 @@ const RegisterScreen = ({navigation}) => {
         try {
           const data = await response.json();
           Alert.alert("Succès", "Inscription réussie");
-          navigation.navigate("LoginScreen")
+          navigation.navigate("HomeScreen");
        
         } catch (error) {
           console.error("Erreur parsing JSON:", error);

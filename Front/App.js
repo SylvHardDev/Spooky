@@ -1,20 +1,15 @@
 
 import React from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { View, StyleSheet } from "react-native";
+import { UserProvider } from './utils/UserContext'
 import MainNavigation from "./navigations/MainNavigation";
 const App = () => {
   return (
-    <SafeAreaProvider>
-      <View style={styles.container}>
-        <MainNavigation />
-      </View>
-    </SafeAreaProvider>
+   
+       <UserProvider>
+       <MainNavigation />
+    </UserProvider>
+     
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+
 export default App;

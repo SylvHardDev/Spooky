@@ -7,8 +7,9 @@ import {
   TextInput,
   Alert,
 } from "react-native";  
-
+import { useUser } from '../utils/UserContext';
 const LoginScreen = ({ navigation }) => {
+  const { setUserData } = useUser();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -30,8 +31,10 @@ const LoginScreen = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
+        setUserData(data);
         // Si la connexion est réussie, naviguez vers l'écran souhaité
         navigation.navigate("HomeScreen");
+        
         Alert.alert("Succès", "Connexion réussie!");
       } else {
         const errorData = await response.json();

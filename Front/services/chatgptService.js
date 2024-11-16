@@ -2,7 +2,7 @@ import axios from "axios";
 
 const openaiEndpoint = "https://api.openai.com/v1/chat/completions";
 
-const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+const apiKey = "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";
 
 export const sendMessageToChatGPT = async (messages) => {
   try {

@@ -6,15 +6,17 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-} from "react-native";
+} from "react-native";  
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://10.166.4.102:5001/api/auth/login", {
+    
+        const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: {
           'Accept': 'application/json',

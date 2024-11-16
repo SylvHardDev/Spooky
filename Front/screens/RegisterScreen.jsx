@@ -16,7 +16,7 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
-
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const handleRegister = async () => {
   
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
@@ -52,7 +52,8 @@ const RegisterScreen = () => {
     try {
       console.log("Envoi des données:", formData);
       
-      const response = await fetch("http://10.166.4.102:5001/api/auth/register", {
+
+        const response = await fetch(`${apiUrl}/auth/register`, {
         method: "POST",
         headers: {
           'Accept': 'application/json',

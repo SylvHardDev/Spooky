@@ -7,21 +7,24 @@ import {
   TextInput,
   Image,
   Alert,
+  Platform,
   Dimensions,
-  ScrollView,
+  ScrollView
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { FontAwesome } from "@expo/vector-icons";
 
+import * as ImagePicker from "expo-image-picker";
 const { height } = Dimensions.get("window");
 
-const RegisterScreen = ({ navigation }) => {
+
+const RegisterScreen = ({navigation}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
-
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const handleRegister = async () => {
+  
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs");
       return;
@@ -32,27 +35,109 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    Alert.alert("Succès", "Inscription réussie !");
-    navigation.navigate("Login");
-  };
+    const formData = new FormData();
+    formData.append("username", username.trim());
+    formData.append("password", password);
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
+    if (avatar) {
+      try {
+        const filename = avatar.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
 
-    if (!result.canceled) {
-      setAvatar(result.assets[0].uri);
+        formData.append("profile_image", {
+          uri: Platform.OS === 'android' ? avatar : avatar.replace('file://', ''),
+          name: filename || 'photo.jpg',
+          type: type,
+        });
+      } catch (error) {
+        console.error("Erreur lors de la préparation de l'image:", error);
+      }
+    }
+
+    try {
+      console.log("Envoi des données:", formData);
+      
+
+        const response = await fetch(`${apiUrl}/auth/register`, {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      console.log("Statut de la réponse:", response.status);
+
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          Alert.alert("Succès", "Inscription réussie");
+          navigation.navigate('Login')
+       
+        } catch (error) {
+          console.error("Erreur parsing JSON:", error);
+          Alert.alert("Succès", "Inscription réussie mais erreur de réponse");
+        }
+      } else {
+        const errorText = await response.text();
+        console.error("Réponse serveur:", errorText);
+        Alert.alert(
+          "Erreur",
+          "Une erreur est survenue lors de l'inscription. Veuillez réessayer."
+        );
+      }
+    } catch (error) {
+      console.error("Erreur réseau:", error);
+      Alert.alert(
+        "Erreur",
+        "Impossible de se connecter au serveur. Vérifiez votre connexion."
+      );
     }
   };
 
+
+const pickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log("Statut de la permission:", status);
+  
+      if (status !== 'granted') {
+        Alert.alert(
+          "Permission refusée",
+          "Nous avons besoin de votre permission pour accéder à la galerie"
+        );
+        return;
+      }
+  
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+  
+      console.log("Résultat du picker:", result);
+  
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        console.log("URI de l'image sélectionnée:", result.assets[0].uri);
+        setAvatar(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sélection de l'image:", error);
+      Alert.alert(
+        "Erreur",
+        "Un problème est survenu lors de la sélection de l'image"
+      );
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Zone bleue */}
+
+         {/* Zone bleue */}
 
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
@@ -68,8 +153,8 @@ const RegisterScreen = ({ navigation }) => {
 
       {/* Titre */}
       <Text style={styles.title}>Inscription</Text>
-
-      {/* Formulaire */}
+        
+        {/* Formulaire */}
       <View style={styles.form}>
         <View style={styles.input}>
           <FontAwesome name="user" size={20} color="#6b7280" style={styles.icon} />
@@ -109,7 +194,7 @@ const RegisterScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Pied de page */}
+         {/* Pied de page */}
       <TouchableOpacity
         onPress={() => navigation.navigate("Login")}
         style={styles.footer}

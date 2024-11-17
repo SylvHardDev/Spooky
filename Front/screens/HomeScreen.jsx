@@ -61,18 +61,21 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>
-          Bienvenue, {user?.username || "Utilisateur"}
-        </Text>
+      <View style={styles.nav}>
 
-        {profileImageUrl ? (
+      {profileImageUrl ? (
           <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
         ) : (
           <Text style={styles.noImage}>Aucune image de profil disponible</Text>
         )}
 
-        <Text style={styles.info}>Email: {user?.email || "Non disponible"}</Text>
+        <Text style={styles.title}>
+          Bienvenue, {user?.username || "Utilisateur"}
+        </Text>
 
+        
+
+      </View>
         <Button
           title="Déconnexion"
           onPress={() => {
@@ -82,7 +85,7 @@ const HomeScreen = ({ navigation }) => {
         />
 
         <View style={styles.header}>
-          <Text style={styles.title}>MedicAlert</Text>
+          <Text style={styles.tilte2}>MedicAlert</Text>
           <FontAwesome5 name="bell" size={24} color="#1E88E5" />
         </View>
 
@@ -180,6 +183,16 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  nav: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tilte2: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#1E88E5",
+  },
   container: {
     flex: 1,
     backgroundColor: "#F5F9FF",
@@ -200,6 +213,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1E88E5",
     marginBottom: 20,
+    marginLeft: "auto",
+    textAlign: "center"
   },
   description: {
     fontSize: 14,
@@ -312,8 +327,8 @@ const styles = StyleSheet.create({
     color: "#1E88E5",
   },
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 75,
     marginBottom: 20,
   },

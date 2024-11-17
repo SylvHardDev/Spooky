@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
-const CalendarScreen = () => {
+import { Ionicons } from "@expo/vector-icons";
+
+
+const CalendarScreen = ({navigation}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +67,12 @@ const CalendarScreen = () => {
   const ListHeaderComponent = () => (
     <>
       <Text style={styles.title}>Agenda prise de médicaments</Text>
+      <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#333" />
+        </TouchableOpacity>
       <Calendar
         style={styles.calendar}
         theme={{
@@ -182,6 +191,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
     marginVertical: 20,
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#6200ee",
+    padding: 10,
+    borderRadius: 20,
+  },
+  backButtonText: {
+    color: "#fff",
+    marginLeft: 8,
   },
 });
 

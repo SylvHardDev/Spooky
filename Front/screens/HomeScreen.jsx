@@ -95,8 +95,13 @@ const HomeScreen = ({ navigation }) => {
 
         <View style={styles.scheduleCard}>
           <View style={styles.scheduleHeader}>
-            <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
-            <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate("CalendarScreen");
+          }}>
+          <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
+          <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
+          </TouchableOpacity>
+            
           </View>
 
           {loading ? (

@@ -16,11 +16,11 @@ const medicationSchema = new mongoose.Schema({
       default: 0,
     },
     afternoon: {
-      type: Number, 
+      type: Number,
       default: 0,
     },
     night: {
-      type: Number, 
+      type: Number,
       default: 0,
     },
   },
@@ -28,9 +28,11 @@ const medicationSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-quantity: {
-  type: Number
-}
+  quantity: {
+    type: Number,
+  },
+}, {
+  timestamps: true 
 });
 
 module.exports = mongoose.model('Medication', medicationSchema);

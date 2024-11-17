@@ -1,7 +1,16 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useState, useContext } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View, Image, Button } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  Button,
+  ScrollView,
+} from "react-native";
 import { AuthContext } from "../utils/authContext.js";
 
 const HomeScreen = ({ navigation }) => {
@@ -14,25 +23,9 @@ const HomeScreen = ({ navigation }) => {
     ? `${apiBaseUrl}/${user.profile_image.replace(/\\/g, "/")}`
     : null;
 
-  // const nav = useNavigation();
-
   // Fonction pour gérer l'importation de fichiers
-  const handleImportFile = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf", "image/*"], // PDF et images
-      });
-
-      if (result.type === "success") {
-        setImportedFile(result);
-        Alert.alert("Fichier importé avec succès", `Nom : ${result.name}`);
-      } else {
-        Alert.alert("Importation annulée");
-      }
-    } catch (error) {
-      Alert.alert("Erreur", "Une erreur s'est produite lors de l'importation.");
-      console.error(error);
-    }
+  const redirect =  () => {
+   navigation.navigate("Scan")
   };
 
   const handleMedicationPress = (med) => {
@@ -47,107 +40,107 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-      <Text style={styles.title}>Bienvenue, {user?.username || "Utilisateur"}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>
+          Bienvenue, {user?.username || "Utilisateur"}
+        </Text>
 
-{profileImageUrl ? (
-  <Image
-    source={{ uri: profileImageUrl }}
-    style={styles.profileImage}
-  />
-) : (
-  <Text style={styles.noImage}>Aucune image de profil disponible</Text>
-)}
+        {profileImageUrl ? (
+          <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+        ) : (
+          <Text style={styles.noImage}>Aucune image de profil disponible</Text>
+        )}
 
-<Text style={styles.info}>Email: {user?.email || "Non disponible"}</Text>
+        <Text style={styles.info}>Email: {user?.email || "Non disponible"}</Text>
 
-<Button title="Déconnexion" onPress={() => {
-  logout();
-  navigation.navigate("Login");
-}} />
-        <Text style={styles.title}>MedicAlert</Text>
-        <FontAwesome5 name="bell" size={24} color="#1E88E5" />
-      </View>
+        <Button
+          title="Déconnexion"
+          onPress={() => {
+            logout();
+            navigation.navigate("Login");
+          }}
+        />
 
-      {/* Texte descriptif */}
-      <Text style={styles.description}>
-        Scannez vos ordonnances : Importez rapidement vos ordonnances en PDF ou
-        en photo. Rappels personnalisés : Recevez des notifications discrètes au
-        moment de prendre vos médicaments. Agenda complet : Visualisez votre
-        planning de traitement en un coup d'œil.
-      </Text>
-
-      {/* Planning du jour */}
-      <View style={styles.scheduleCard}>
-        <View style={styles.scheduleHeader}>
-          <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
-          <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>MedicAlert</Text>
+          <FontAwesome5 name="bell" size={24} color="#1E88E5" />
         </View>
-        {todaysMeds.map((med, index) => (
+
+        <Text style={styles.description}>
+          Scannez vos ordonnances : Importez rapidement vos ordonnances en PDF
+          ou en photo. Rappels personnalisés : Recevez des notifications
+          discrètes au moment de prendre vos médicaments. Agenda complet :
+          Visualisez votre planning de traitement en un coup d'œil.
+        </Text>
+
+        <View style={styles.scheduleCard}>
+          <View style={styles.scheduleHeader}>
+            <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
+            <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
+          </View>
+          {todaysMeds.map((med, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.medicationItem}
+              onPress={() => handleMedicationPress(med)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.medicationInfo}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    { backgroundColor: med.taken ? "#43A047" : "#1E88E5" },
+                  ]}
+                />
+                <Text style={styles.medicationName}>{med.name}</Text>
+              </View>
+              <View style={styles.timeContainer}>
+                <FontAwesome5 name="clock" size={16} color="#666" />
+                <Text style={styles.timeText}>{med.time}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>85%</Text>
+            <Text style={styles.statLabel}>Respect du{"\n"}traitement</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>3/4</Text>
+            <Text style={styles.statLabel}>Prises{"\n"}aujourd'hui</Text>
+          </View>
+        </View>
+
+        <View style={styles.actionButtons}>
           <TouchableOpacity
-            key={index}
-            style={styles.medicationItem}
-            onPress={() => handleMedicationPress(med)} // Correctly binds the handler
-            activeOpacity={0.7} // Makes the touch interaction more visible
+            style={[styles.actionButton, { backgroundColor: "#1E88E5" }]}
+           onPress={redirect}
           >
-            <View style={styles.medicationInfo}>
-              <View
-                style={[
-                  styles.statusDot,
-                  { backgroundColor: med.taken ? "#43A047" : "#1E88E5" },
-                ]}
-              />
-              <Text style={styles.medicationName}>{med.name}</Text>
-            </View>
-            <View style={styles.timeContainer}>
-              <FontAwesome5 name="clock" size={16} color="#666" />
-              <Text style={styles.timeText}>{med.time}</Text>
-            </View>
+            <FontAwesome5 name="camera" size={24} color="white" />
+            <Text style={styles.actionButtonText}>
+              Importer{"\n"}une ordonnance
+            </Text>
           </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Statistiques */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>85%</Text>
-          <Text style={styles.statLabel}>Respect du{"\n"}traitement</Text>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#43A047" }]}
+          >
+            <FontAwesome5 name="plus-circle" size={24} color="white" />
+            <Text style={styles.actionButtonText}>
+              Scanner{"\n"}une ordonnance
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>3/4</Text>
-          <Text style={styles.statLabel}>Prises{"\n"}aujourd'hui</Text>
-        </View>
-      </View>
 
-      {/* Boutons d'action */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: "#1E88E5" }]}
-          onPress={handleImportFile}
-        >
-          <FontAwesome5 name="camera" size={24} color="white" />
-          <Text style={styles.actionButtonText}>
-            Importer{"\n"}une ordonnance
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: "#43A047" }]}
-        >
-          <FontAwesome5 name="plus-circle" size={24} color="white" />
-          <Text style={styles.actionButtonText}>
-            Scanner{"\n"}une ordonnance
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Fichier importé */}
-      {importedFile && (
-        <View style={styles.importedFileContainer}>
-          <Text style={styles.importedFileText}>
-            Fichier importé : {importedFile.name}
-          </Text>
-        </View>
-      )}
+        {importedFile && (
+          <View style={styles.importedFileContainer}>
+            <Text style={styles.importedFileText}>
+              Fichier importé : {importedFile.name}
+            </Text>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -155,8 +148,11 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F5F9FF",
+  },
+  scrollContainer: {
     padding: 20,
-    backgroundColor: "#F5F9FF", // Couleur de fond claire
+    paddingBottom: 20,
   },
   header: {
     flexDirection: "row",
@@ -169,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#1E88E5",
+    marginBottom: 20,
   },
   description: {
     fontSize: 14,
@@ -211,19 +208,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  scheduleHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  scheduleTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginLeft: 10,
-    color: "#1E88E5",
-  },
   medicationItem: {
-    zIndex: 1000,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -291,11 +276,6 @@ const styles = StyleSheet.create({
   importedFileText: {
     fontSize: 14,
     color: "#1E88E5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
   },
   profileImage: {
     width: 150,

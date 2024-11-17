@@ -1,23 +1,47 @@
 const Medication = require('../models/Medication');
 
 // Ajouter un médicament
+// exports.addMedication = async (req, res) => {
+//   try {
+//     const { name, dosage, schedule, instructions} = req.body;
+
+//     const newMedication = new Medication({
+//       name,
+//       dosage,
+//       schedule,
+//       instructions
+//     });
+
+//     await newMedication.save();
+//     res.status(201).json({ message: "Médicament ajouté avec succès", medication: newMedication });
+//   } catch (error) {
+//     res.status(500).json({ message: "Erreur lors de l'ajout du médicament", error: error.message });
+//   }
+// };
+// Ajouter un ou plusieurs médicaments
 exports.addMedication = async (req, res) => {
   try {
-    const { name, dosage, schedule, instructions} = req.body;
+    const medications = req.body; // Attendez un tableau d'objets
 
-    const newMedication = new Medication({
-      name,
-      dosage,
-      schedule,
-      instructions
+    if (!Array.isArray(medications) || medications.length === 0) {
+      return res.status(400).json({ message: "Aucun médicament fourni" });
+    }
+
+    // Enregistrez tous les médicaments en une seule opération
+    const savedMedications = await Medication.insertMany(medications);
+
+    res.status(201).json({
+      message: "Médicaments ajoutés avec succès",
+      medications: savedMedications,
     });
-
-    await newMedication.save();
-    res.status(201).json({ message: "Médicament ajouté avec succès", medication: newMedication });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de l'ajout du médicament", error: error.message });
+    res.status(500).json({
+      message: "Erreur lors de l'ajout des médicaments",
+      error: error.message,
+    });
   }
 };
+
 
 // Obtenir tous les médicaments
 exports.getAllMedications = async (req, res) => {

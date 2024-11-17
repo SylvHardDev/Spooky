@@ -7,6 +7,7 @@ import MedicationDetailScreen from "../screens/MedicationDetailScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 
 import { AuthProvider } from "../utils/authContext";
+import Scan from "../screens/Scan";
 
 const MainNavigation = () => {
   const Stack = createStackNavigator();
@@ -23,6 +24,11 @@ const MainNavigation = () => {
           options={{ headerShown: false }}
           name="MedicationDetailScreen"
           component={MedicationDetailScreen}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Scan"
+          component={Scan}
         />
         <Stack.Screen
           options={{ headerShown: false }}

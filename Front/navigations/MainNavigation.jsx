@@ -5,6 +5,7 @@ import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
 import MedicationDetailScreen from "../screens/MedicationDetailScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import CalendarScreen from '../screens/CalendarScreen'
 
 import { AuthProvider } from "../utils/authContext";
 import Scan from "../screens/Scan";
@@ -14,7 +15,12 @@ const MainNavigation = () => {
   return (
     <AuthProvider>
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator><Stack.Screen
+          options={{ headerShown: false }}
+          name="CalendarScreen"
+          component={CalendarScreen}
+        />
+
         <Stack.Screen
           options={{ headerShown: false }}
           name="Login"

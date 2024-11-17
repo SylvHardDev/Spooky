@@ -47,7 +47,7 @@ const LoginScreen = ({ navigation }) => {
       console.error("Erreur réseau:", error);
       Alert.alert(
         "Erreur",
-        "Impossible de se connecter au serveur. Vérifiez votre connexion internet."
+        "Impossible de se connecter au serveur. Vérifiez votre connexion internet"
       );
     }
   };

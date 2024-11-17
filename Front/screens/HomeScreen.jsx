@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { AuthContext } from "../utils/authContext.js";
+import ShowNotification from "../components/ShowNotification.jsx";
 
 const HomeScreen = ({ navigation }) => {
   const [importedFile, setImportedFile] = useState(null);
@@ -72,6 +73,7 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.title}>
           Bienvenue, {user?.username || "Utilisateur"}
         </Text>
+        <ShowNotification />
 
         
 

@@ -8,7 +8,6 @@ const medicationSchema = new mongoose.Schema({
   },
   dosage: {
     type: String,
-    required: true,
     trim: true,
   },
   schedule: {

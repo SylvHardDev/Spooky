@@ -115,13 +115,15 @@ const Scan = () => {
 
   const postDataToAPI = async (data) => {
     try {
-      const response = await fetch("http://10.0.2.2:5001/api/medication", {
+      const response = await fetch("http://10.166.4.101:5001/api/medication", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
+
+      console.log(data)
 
       if (response.ok) {
         Alert.alert("Succès", "Les données ont été envoyées à l'API.");

@@ -16,9 +16,11 @@ const Scan = () => {
   const [image, setImage] = useState(null);
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  const apiKey = process.env.EXPO_PUBLIC_API_KEY_GEMINI;
 
   // Remplacez API_KEY par votre clé API Gemini
-  const genAI = new GoogleGenerativeAI("AIzaSyB3DQmA901qpVRBViq5596TDSYkfvrEMgg");
+  const genAI = new GoogleGenerativeAI(apiKey);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -115,7 +117,7 @@ const Scan = () => {
 
   const postDataToAPI = async (data) => {
     try {
-      const response = await fetch("http://10.166.4.101:5001/api/medication", {
+      const response = await fetch(`${apiUrl}/medication`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

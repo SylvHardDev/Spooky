@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as DocumentPicker from "expo-document-picker";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Alert,
   StyleSheet,
@@ -10,11 +9,14 @@ import {
   Image,
   Button,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { AuthContext } from "../utils/authContext.js";
 
 const HomeScreen = ({ navigation }) => {
   const [importedFile, setImportedFile] = useState(null);
+  const [todaysMeds, setTodaysMeds] = useState([]); // Médicaments du jour
+  const [loading, setLoading] = useState(false); // État de chargement
   const { user, logout } = useContext(AuthContext);
   const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -23,9 +25,26 @@ const HomeScreen = ({ navigation }) => {
     ? `${apiBaseUrl}/${user.profile_image.replace(/\\/g, "/")}`
     : null;
 
-  // Fonction pour gérer l'importation de fichiers
-  const redirect =  () => {
-   navigation.navigate("Scan")
+  useEffect(() => {
+    fetchTodaysMeds();
+  }, []);
+
+  const fetchTodaysMeds = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://10.166.4.101:5001/api/medication");
+      if (response.ok) {
+        const data = await response.json();
+        setTodaysMeds(data.medications); // Met à jour les médicaments
+      } else {
+        throw new Error("Erreur lors de la récupération des médicaments.");
+      }
+    } catch (error) {
+      console.error("Erreur :", error.message);
+      Alert.alert("Erreur", "Impossible de charger les médicaments.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMedicationPress = (med) => {
@@ -33,10 +52,9 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("MedicationDetailScreen", { medication: med });
   };
 
-  const todaysMeds = [
-    { name: "Doliprane 1000mg", time: "08:00", taken: false },
-    { name: "Amoxicilline", time: "12:30", taken: true },
-  ];
+  const redirect = () => {
+    navigation.navigate("Scan");
+  };
 
   return (
     <View style={styles.container}>
@@ -78,28 +96,37 @@ const HomeScreen = ({ navigation }) => {
             <FontAwesome5 name="calendar-alt" size={20} color="#1E88E5" />
             <Text style={styles.scheduleTitle}>Aujourd'hui</Text>
           </View>
-          {todaysMeds.map((med, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.medicationItem}
-              onPress={() => handleMedicationPress(med)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.medicationInfo}>
-                <View
-                  style={[
-                    styles.statusDot,
-                    { backgroundColor: med.taken ? "#43A047" : "#1E88E5" },
-                  ]}
-                />
-                <Text style={styles.medicationName}>{med.name}</Text>
-              </View>
-              <View style={styles.timeContainer}>
-                <FontAwesome5 name="clock" size={16} color="#666" />
-                <Text style={styles.timeText}>{med.time}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+
+          {loading ? (
+            <ActivityIndicator size="large" color="#1E88E5" />
+          ) : todaysMeds.length > 0 ? (
+            todaysMeds.map((med, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.medicationItem}
+                onPress={() => handleMedicationPress(med)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.medicationInfo}>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      { backgroundColor: med.taken ? "#43A047" : "#1E88E5" },
+                    ]}
+                  />
+                  <Text style={styles.medicationName}>{med.name}</Text>
+                </View>
+                <View style={styles.timeContainer}>
+                  <FontAwesome5 name="clock" size={16} color="#666" />
+                  <Text style={styles.timeText}>{med.schedule.morning > 0 ? "Matin" : "Soir"}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noDataText}>
+              Aucun médicament prévu pour aujourd'hui.
+            </Text>
+          )}
         </View>
 
         <View style={styles.statsContainer}>
@@ -116,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: "#1E88E5" }]}
-           onPress={redirect}
+            onPress={redirect}
           >
             <FontAwesome5 name="camera" size={24} color="white" />
             <Text style={styles.actionButtonText}>
@@ -295,3 +322,5 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+

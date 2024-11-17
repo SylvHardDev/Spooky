@@ -35,7 +35,9 @@ const HomeScreen = ({ navigation }) => {
       const response = await fetch("http://10.166.4.101:5001/api/medication");
       if (response.ok) {
         const data = await response.json();
-        setTodaysMeds(data.medications); // Met à jour les médicaments
+        setTodaysMeds(data.medications); 
+        console.log(todaysMeds);
+        // Met à jour les médicaments
       } else {
         throw new Error("Erreur lors de la récupération des médicaments.");
       }

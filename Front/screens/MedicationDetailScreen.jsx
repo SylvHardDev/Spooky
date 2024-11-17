@@ -499,16 +499,11 @@ const MedicationDetailScreen = ({ navigation, route }) => {
                 Après-midi : {medication.schedule?.afternoon || 0}
               </Text>
             </View>
+            
             <View style={styles.tag}>
               <Ionicons name="time-outline" size={16} color="#6200ee" />
               <Text style={styles.tagText}>
-                Soir : {medication.schedule?.evening || 0}
-              </Text>
-            </View>
-            <View style={styles.tag}>
-              <Ionicons name="time-outline" size={16} color="#6200ee" />
-              <Text style={styles.tagText}>
-                Nuit : {medication.schedule?.night || 0}
+                Soir : {medication.schedule?.night || 0}
               </Text>
             </View>
           </View>

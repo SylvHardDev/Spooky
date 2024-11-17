@@ -19,10 +19,6 @@ const medicationSchema = new mongoose.Schema({
       type: Number, 
       default: 0,
     },
-    evening: {
-      type: Number, 
-      default: 0,
-    },
     night: {
       type: Number, 
       default: 0,
@@ -31,7 +27,10 @@ const medicationSchema = new mongoose.Schema({
   instructions: {
     type: String,
     trim: true,
-  }
+  },
+quantity: {
+  type: Number
+}
 });
 
 module.exports = mongoose.model('Medication', medicationSchema);

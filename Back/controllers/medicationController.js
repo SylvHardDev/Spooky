@@ -1,24 +1,5 @@
 const Medication = require('../models/Medication');
 
-// Ajouter un médicament
-// exports.addMedication = async (req, res) => {
-//   try {
-//     const { name, dosage, schedule, instructions} = req.body;
-
-//     const newMedication = new Medication({
-//       name,
-//       dosage,
-//       schedule,
-//       instructions
-//     });
-
-//     await newMedication.save();
-//     res.status(201).json({ message: "Médicament ajouté avec succès", medication: newMedication });
-//   } catch (error) {
-//     res.status(500).json({ message: "Erreur lors de l'ajout du médicament", error: error.message });
-//   }
-// };
-// Ajouter un ou plusieurs médicaments
 exports.addMedication = async (req, res) => {
   try {
     const medications = req.body; // Attendez un tableau d'objets

@@ -99,7 +99,7 @@ const CalendarScreen = () => {
             Dosage : {item.dosage || 'Non spécifié'}
           </Text>
           <Text style={styles.medicationSchedule}>
-            Morning: {item.schedule.morning} | Afternoon: {item.schedule.afternoon} | Evening: {item.schedule.evening} | Night: {item.schedule.night}
+            Morning: {item.schedule.morning} | Afternoon: {item.schedule.afternoon}  | Night: {item.schedule.night}
           </Text>
           {item.instructions && (
             <Text style={styles.medicationInstructions}>

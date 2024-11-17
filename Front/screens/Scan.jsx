@@ -19,12 +19,12 @@ const Scan = () => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const apiKey = process.env.EXPO_PUBLIC_API_KEY_GEMINI;
 
-  // Remplacez API_KEY par votre clé API Gemini
+  // Initialisation de l'API
   const genAI = new GoogleGenerativeAI(apiKey);
 
+  // Sélection d'image
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
     if (status !== "granted") {
       alert(
         "Désolé, nous avons besoin des permissions pour accéder à la galerie !"
@@ -46,19 +46,21 @@ const Scan = () => {
     }
   };
 
+  // Analyse de l'image
   const analyzeImage = async (base64Image) => {
     try {
       setLoading(true);
-  
+
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-  
+
       const prompt = [
         {
           text:
             "Analyse le texte de cette ordonnance et extrais les informations suivantes pour chaque médicament :\n\n" +
             "Nom du médicament : Le nom exact tel qu'il apparaît dans le texte.\n" +
             "Dosage : Indique la concentration ou dose prescrite (exemple : '200 mg').\n" +
-            "Horaire : Décompose la fréquence d'administration par période de la journée (exemple : 'matin : 2, après-midi : 1, soir : 0, nuit : 1').\n" +
+            "Horaire : Décompose la fréquence d'administration par période de la journée (exemple : 'matin : 2, après-midi : 1, nuit : 0').\n" +
+            "Quantité : La quantité totale prescrite.\n" +
             "Instructions : Mentionne des consignes supplémentaires s'il y en a (exemple : 'À prendre après un repas').\n" +
             "Format attendu : Organise les informations pour chaque médicament dans un objet JSON :\n" +
             "{\n" +
@@ -67,11 +69,11 @@ const Scan = () => {
             '  "schedule": {\n' +
             '    "morning": 0,\n' +
             '    "afternoon": 0,\n' +
-            '    "evening": 0,\n' +
             '    "night": 0\n' +
             "  },\n" +
+            '  "quantity": 0,\n' +
             '  "instructions": "Instructions supplémentaires"\n' +
-            "} tout est nulable sauf le nom du médicament et le dosage",
+            "} tout est nullable sauf le nom du médicament et le dosage.",
         },
         {
           inlineData: {
@@ -80,25 +82,25 @@ const Scan = () => {
           },
         },
       ];
-  
+
       const result = await model.generateContent(prompt);
-  
+
       if (result && result.response) {
         const responseText = await result.response.text();
         console.log("Réponse brute :", responseText);
-  
+
         // Nettoyer la réponse brute
         const cleanedResponse = responseText
-          .replace(/```json/g, "") // Supprimer ```json
-          .replace(/```/g, "") // Supprimer ```
-          .trim(); // Retirer les espaces inutiles
-  
+          .replace(/```json/g, "")
+          .replace(/```/g, "")
+          .trim();
+
         console.log("Réponse nettoyée :", cleanedResponse);
-  
+
         try {
-          const parsedResponse = JSON.parse(cleanedResponse); // Parser le JSON nettoyé
+          const parsedResponse = JSON.parse(cleanedResponse);
           setAnalysis(parsedResponse);
-          postDataToAPI(parsedResponse); // Envoyer les données
+          postDataToAPI(parsedResponse);
         } catch (error) {
           console.error("Erreur de parsing JSON :", error);
           setAnalysis("Réponse brute nettoyée mais erreur de parsing : " + cleanedResponse);
@@ -113,8 +115,8 @@ const Scan = () => {
       setLoading(false);
     }
   };
-  
 
+  // Envoyer les données à l'API
   const postDataToAPI = async (data) => {
     try {
       const response = await fetch(`${apiUrl}/medication`, {
@@ -125,7 +127,7 @@ const Scan = () => {
         body: JSON.stringify(data),
       });
 
-      console.log(data)
+      console.log("Données envoyées :", data);
 
       if (response.ok) {
         Alert.alert("Succès", "Les données ont été envoyées à l'API.");
@@ -133,9 +135,7 @@ const Scan = () => {
         const errorData = await response.json();
         Alert.alert(
           "Erreur",
-          `Erreur lors de l'envoi des données : ${
-            errorData.message || "Erreur inconnue"
-          }`
+          `Erreur lors de l'envoi des données : ${errorData.message || "Erreur inconnue"}`
         );
       }
     } catch (error) {

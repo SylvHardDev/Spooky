@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -11,18 +11,19 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { AuthContext } from "../utils/authContext";
+import { Ionicons } from "@expo/vector-icons"; // Pour l'icône Back
 
-const Scan = () => {
+const Scan = ({ navigation }) => {
+  const { updateMedications } = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const apiKey = process.env.EXPO_PUBLIC_API_KEY_GEMINI;
 
-  // Initialisation de l'API
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  // Sélection d'image
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -46,7 +47,6 @@ const Scan = () => {
     }
   };
 
-  // Analyse de l'image
   const analyzeImage = async (base64Image) => {
     try {
       setLoading(true);
@@ -89,7 +89,6 @@ const Scan = () => {
         const responseText = await result.response.text();
         console.log("Réponse brute :", responseText);
 
-        // Nettoyer la réponse brute
         const cleanedResponse = responseText
           .replace(/```json/g, "")
           .replace(/```/g, "")
@@ -116,7 +115,6 @@ const Scan = () => {
     }
   };
 
-  // Envoyer les données à l'API
   const postDataToAPI = async (data) => {
     try {
       const response = await fetch(`${apiUrl}/medication`, {
@@ -127,10 +125,10 @@ const Scan = () => {
         body: JSON.stringify(data),
       });
 
-      console.log("Données envoyées :", data);
-
       if (response.ok) {
-        Alert.alert("Succès", "Les données ont été envoyées à l'API.");
+        const savedMedication = await response.json();
+        updateMedications(savedMedication);
+        Alert.alert("Succès", "Le médicament a été ajouté avec succès !");
       } else {
         const errorData = await response.json();
         Alert.alert(
@@ -146,6 +144,15 @@ const Scan = () => {
 
   return (
     <View style={styles.container}>
+      {/* Bouton de retour */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("HomeScreen")} // Redirection vers HomeScreen
+      >
+        <Ionicons name="chevron-back" size={24} color="#007AFF" />
+        <Text style={styles.backButtonText}>Retour</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Text style={styles.buttonText}>Sélectionner une image</Text>
       </TouchableOpacity>
@@ -175,9 +182,18 @@ const Scan = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     padding: 20,
     backgroundColor: "#F5F9FF",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  backButtonText: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: "#007AFF",
   },
   button: {
     backgroundColor: "#007AFF",
